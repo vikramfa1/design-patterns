@@ -1,4 +1,4 @@
-package designPatterns.AbstractFactoryPattern.Keyboard;
+package designPatterns.AbstractFactoryPattern.Keyboard.factory.model;
 
 
 public class WindowsKeyboard implements Keyboard {

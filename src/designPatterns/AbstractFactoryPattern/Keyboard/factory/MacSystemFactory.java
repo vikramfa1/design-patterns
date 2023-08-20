@@ -1,9 +1,9 @@
 package designPatterns.AbstractFactoryPattern.Keyboard.factory;
 
-import designPatterns.AbstractFactoryPattern.Keyboard.Keyboard;
-import designPatterns.AbstractFactoryPattern.Keyboard.MacMouse;
-import designPatterns.AbstractFactoryPattern.Keyboard.MacOsKeyboard;
-import designPatterns.AbstractFactoryPattern.Keyboard.Mouse;
+import designPatterns.AbstractFactoryPattern.Keyboard.factory.model.Keyboard;
+import designPatterns.AbstractFactoryPattern.Keyboard.factory.model.MacMouse;
+import designPatterns.AbstractFactoryPattern.Keyboard.factory.model.MacOsKeyboard;
+import designPatterns.AbstractFactoryPattern.Keyboard.factory.model.Mouse;
 
 public class MacSystemFactory implements SystemFactory{
     @Override
