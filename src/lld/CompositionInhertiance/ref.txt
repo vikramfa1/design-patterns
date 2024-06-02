@@ -1,0 +1,4 @@
+https://www.geeksforgeeks.org/difference-between-inheritance-and-composition-in-java/
+https://www.digitalocean.com/community/tutorials/composition-vs-inheritance
+https://www.geeksforgeeks.org/association-composition-aggregation-java/
+https://github.com/anomaly2104/coding-recipies/tree/master/src/main/java/com/uditagarwal/composition_over_inheritance/chess

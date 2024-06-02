@@ -1,0 +1,9 @@
+* https://www.geeksforgeeks.org/customthreadpoolexecutor-in-java-executor-framework/
+
+* flaw in above design: creating new thread everytime.
+* instead create a thread pool as part of constructor..
+* infinitely poll() the tasks from the blockQueue.
+        * as part of submit() function, notify the threads to pick the tasks
+        * if there are no tasks, go to wait() state, so that threads can be unloaded from the
+                * from CPU core...
+* call interrupt() for each as part of shutDownNow() in the thread service..
