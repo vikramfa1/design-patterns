@@ -1,0 +1,4 @@
+list:
+* https://leetcode.com/discuss/interview-experience/1659496/microsoft-senior-software-engineer-63-noida-october-2021-offer/1202575
+*
+

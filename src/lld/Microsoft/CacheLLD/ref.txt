@@ -1,0 +1,196 @@
+Designing an in-memory caching library in Java that supports dynamic eviction policies and ensures thread safety without blocking queues is a complex task. Below is a high-level design and implementation of such a caching library. The design focuses on modularity, extensibility, and thread safety.
+https://chatgpt.com/share/88c1459b-f4dc-4d14-916d-9fb3a031c822
+### Key Components
+
+1. **Cache Interface**: Defines the basic operations of the cache.
+2. **EvictionPolicy Interface**: Defines the methods required for an eviction policy.
+3. **Cache Implementation**: The concrete implementation of the cache.
+4. **Thread Safety**: Implement thread safety using `ConcurrentHashMap` and `ReadWriteLock`.
+
+### Cache Interface
+
+```java
+public interface Cache<K, V> {
+    void put(K key, V value);
+    V get(K key);
+    void remove(K key);
+    void setEvictionPolicy(EvictionPolicy<K> evictionPolicy);
+}
+```
+
+### Eviction Policy Interface
+
+```java
+public interface EvictionPolicy<K> {
+    void keyAccessed(K key);
+    K evictKey();
+}
+```
+
+### Least Recently Used (LRU) Eviction Policy
+
+```java
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LRUEvictionPolicy<K> implements EvictionPolicy<K> {
+    private final LinkedHashMap<K, Boolean> accessOrder;
+
+    public LRUEvictionPolicy() {
+        this.accessOrder = new LinkedHashMap<>(16, 0.75f, true);
+    }
+
+    @Override
+    public void keyAccessed(K key) {
+        accessOrder.put(key, Boolean.TRUE);
+    }
+
+    @Override
+    public K evictKey() {
+        Map.Entry<K, Boolean> eldest = accessOrder.entrySet().iterator().next();
+        accessOrder.remove(eldest.getKey());
+        return eldest.getKey();
+    }
+}
+```
+
+### Least Frequently Used (LFU) Eviction Policy
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+
+public class LFUEvictionPolicy<K> implements EvictionPolicy<K> {
+    private final Map<K, Integer> frequencyMap;
+    private final PriorityQueue<K> minHeap;
+
+    public LFUEvictionPolicy() {
+        this.frequencyMap = new HashMap<>();
+        this.minHeap = new PriorityQueue<>((a, b) -> frequencyMap.get(a) - frequencyMap.get(b));
+    }
+
+    @Override
+    public void keyAccessed(K key) {
+        frequencyMap.put(key, frequencyMap.getOrDefault(key, 0) + 1);
+        minHeap.remove(key);
+        minHeap.offer(key);
+    }
+
+    @Override
+    public K evictKey() {
+        K evict = minHeap.poll();
+        frequencyMap.remove(evict);
+        return evict;
+    }
+}
+```
+
+### Cache Implementation
+
+```java
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class InMemoryCache<K, V> implements Cache<K, V> {
+    private final ConcurrentHashMap<K, V> cacheMap;
+    private final ReadWriteLock lock;
+    private EvictionPolicy<K> evictionPolicy;
+    private final int capacity;
+
+    public InMemoryCache(int capacity, EvictionPolicy<K> evictionPolicy) {
+        this.cacheMap = new ConcurrentHashMap<>();
+        this.lock = new ReentrantReadWriteLock();
+        this.evictionPolicy = evictionPolicy;
+        this.capacity = capacity;
+    }
+
+    @Override
+    public void put(K key, V value) {
+        lock.writeLock().lock();
+        try {
+            if (cacheMap.size() >= capacity) {
+                K evictKey = evictionPolicy.evictKey();
+                cacheMap.remove(evictKey);
+            }
+            cacheMap.put(key, value);
+            evictionPolicy.keyAccessed(key);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public V get(K key) {
+        lock.readLock().lock();
+        try {
+            V value = cacheMap.get(key);
+            if (value != null) {
+                evictionPolicy.keyAccessed(key);
+            }
+            return value;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void remove(K key) {
+        lock.writeLock().lock();
+        try {
+            cacheMap.remove(key);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void setEvictionPolicy(EvictionPolicy<K> evictionPolicy) {
+        lock.writeLock().lock();
+        try {
+            this.evictionPolicy = evictionPolicy;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+}
+```
+
+### Usage Example
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Cache<String, String> cache = new InMemoryCache<>(3, new LRUEvictionPolicy<>());
+
+        cache.put("a", "A");
+        cache.put("b", "B");
+        cache.put("c", "C");
+
+        cache.get("a");
+        cache.put("d", "D");  // This should evict "b" as it's LRU
+
+        System.out.println(cache.get("b"));  // Should return null
+
+        cache.setEvictionPolicy(new LFUEvictionPolicy<>());
+
+        cache.put("e", "E");
+        cache.get("a");
+        cache.put("f", "F");  // This should evict "c" as it's LFU
+    }
+}
+```
+
+### Thread Safety
+
+- **ConcurrentHashMap** is used to ensure that the cache operations can happen concurrently without blocking.
+- **ReadWriteLock** is used to handle cache modifications, ensuring readers don't block each other and writers have exclusive access.
+
+### Summary
+
+- **Modularity**: The cache and eviction policies are defined by interfaces, allowing easy extension and modification.
+- **Extensibility**: New eviction policies can be added by implementing the `EvictionPolicy` interface.
+- **Thread Safety**: Concurrent access is managed using `ConcurrentHashMap` and `ReadWriteLock`.
+
+This design ensures a balance between efficiency and simplicity, providing a robust in-memory caching solution.

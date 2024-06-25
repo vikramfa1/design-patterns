@@ -3,9 +3,6 @@ package lld;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RokuInterview {
-}
-
 class Node {
     public char alphabet;
     public boolean isDuplicate;
@@ -17,12 +14,12 @@ class Node {
     }
 }
 
-class Main {
-    static Map<Character, Node> map = new HashMap<>();
-    static Node head = new Node('A');
-    static Node tail = head;
+public class RokuInterview {
+    public Map<Character, Node> map = new HashMap<>();
+    public Node head = new Node('A');
+    public Node tail = head;
 
-    private static char getFirstNonRepeatingCharacter() {
+    private char getFirstNonRepeatingCharacter() {
         if(head.next==null) {
             return 'G';
         } else {
@@ -31,7 +28,7 @@ class Main {
         }
     }
 
-    private static void accept(char ch) {
+    private void accept(char ch) {
 
         if(map.containsKey(ch)) {
             Node removeNode = map.get(ch);
@@ -54,11 +51,12 @@ class Main {
         }
     }
     public static void main(String[] args) {
-        accept('a');
-        accept('b');
-        System.out.println("result: " +String.valueOf(getFirstNonRepeatingCharacter()));
-        System.out.println("result: " +String.valueOf(getFirstNonRepeatingCharacter()));
-        accept('a');
-        System.out.println("result: " +String.valueOf(getFirstNonRepeatingCharacter()));
+        RokuInterview interview = new RokuInterview();
+        interview.accept('a');
+        interview.accept('b');
+        System.out.println("result: " +String.valueOf(interview.getFirstNonRepeatingCharacter()));
+        System.out.println("result: " +String.valueOf(interview.getFirstNonRepeatingCharacter()));
+        interview.accept('a');
+        System.out.println("result: " +String.valueOf(interview.getFirstNonRepeatingCharacter()));
     }
 }

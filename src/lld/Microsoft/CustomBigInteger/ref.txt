@@ -1,0 +1,115 @@
+https://chatgpt.com/share/931e7dca-87fa-4deb-8135-35d6dda83ef3
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class BigInteger {
+
+    // Internal representation of the big integer (least significant digit first)
+    private List<Integer> digits;
+    private boolean isNegative;
+
+    // Constructors
+    public BigInteger(String value) {
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException("Invalid input");
+        }
+
+        digits = new ArrayList<>();
+        isNegative = value.charAt(0) == '-';
+
+        for (int i = value.length() - 1; i >= (isNegative ? 1 : 0); i--) {
+            char c = value.charAt(i);
+            if (Character.isDigit(c)) {
+                digits.add(c - '0');
+            } else {
+                throw new IllegalArgumentException("Invalid character in input");
+            }
+        }
+    }
+
+    // Addition
+    public BigInteger add(BigInteger other) {
+        if (this.isNegative == other.isNegative) {
+            return new BigInteger(addDigits(this.digits, other.digits), this.isNegative);
+        } else {
+            if (this.isNegative) {
+                return other.subtract(new BigInteger(this.digits, false));
+            } else {
+                return this.subtract(new BigInteger(other.digits, false));
+            }
+        }
+    }
+
+    private List<Integer> addDigits(List<Integer> a, List<Integer> b) {
+        List<Integer> result = new ArrayList<>();
+        int carry = 0;
+
+        int maxLength = Math.max(a.size(), b.size());
+        for (int i = 0; i < maxLength; i++) {
+            int digitA = i < a.size() ? a.get(i) : 0;
+            int digitB = i < b.size() ? b.get(i) : 0;
+
+            int sum = digitA + digitB + carry;
+            result.add(sum % 10);
+            carry = sum / 10;
+        }
+
+        if (carry > 0) {
+            result.add(carry);
+        }
+
+        return result;
+    }
+
+    // Subtraction
+    public BigInteger subtract(BigInteger other) {
+        // TODO: Implement subtraction
+        return null;
+    }
+
+    // Multiplication
+    public BigInteger multiply(BigInteger other) {
+        // TODO: Implement multiplication
+        return null;
+    }
+
+    // Division
+    public BigInteger divide(BigInteger other) {
+        // TODO: Implement division
+        return null;
+    }
+
+    // Utility functions
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (isNegative) {
+            sb.append('-');
+        }
+
+        for (int i = digits.size() - 1; i >= 0; i--) {
+            sb.append(digits.get(i));
+        }
+
+        return sb.toString();
+    }
+
+    // Private constructor for internal use
+    private BigInteger(List<Integer> digits, boolean isNegative) {
+        this.digits = new ArrayList<>(digits);
+        this.isNegative = isNegative;
+    }
+
+    // Main method for testing
+    public static void main(String[] args) {
+        BigInteger num1 = new BigInteger("123456789");
+        BigInteger num2 = new BigInteger("987654321");
+
+        BigInteger sum = num1.add(num2);
+        System.out.println(num1 + " + " + num2 + " = " + sum);
+
+        // TODO: Add more tests for subtraction, multiplication, division
+    }
+}

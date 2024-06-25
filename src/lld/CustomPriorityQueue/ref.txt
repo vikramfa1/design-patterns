@@ -1,0 +1,12 @@
+https://www.programiz.com/dsa/priority-queue
+https://www.hackerearth.com/practice/notes/heaps-and-priority-queues/
+
+insert()
+delete()
+heapify() function
+    use - List Data Structure
+    to pick the node's child -
+        i -current node
+        2*i+1 - left child
+        2*i+2 -right child
+    call heapify() func from (N/2+1) to 0

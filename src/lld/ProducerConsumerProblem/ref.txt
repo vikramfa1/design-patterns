@@ -1,3 +1,6 @@
 ref links:
 https://www.freecodecamp.org/news/java-multithreading-producer-consumer-problem/
 * using synchronised & blockingQueue - put()& take()
+
+conventional:
+https://www.freecodecamp.org/news/java-multithreading-producer-consumer-problem/
